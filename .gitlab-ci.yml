@@ -53,9 +53,11 @@ build-rootfs:
 
 build-docker-images:
     stage: register
-    image: docker:latest
+    image: debian:testing
     services:
         - docker:dind
+    variables:
+        DOCKER_HOST: 'tcp://docker:2375'
     dependencies:
         - build-rootfs
     artifacts:
@@ -63,10 +65,16 @@ build-docker-images:
             - "*.conf"
     script: |
         set -e
-        apk update
-        apk add bash git
-        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+        # Install tools
+        apt-get -y update
+        apt-get -y install --no-install-recommends binfmt-support ca-certificates docker.io git qemu-user-static
+        # Enable support for additional executable binary formats
+        update-binfmts --enable
+        echo "Executable binary formats:"
+        update-binfmts --display | grep -v = | sed -e 's/^/  /' -e 's/:$//'
+        # Log in to Docker registries
         echo "$CI_JOB_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+        # Build the Docker images
         for distro in $BASE_DISTROS; do
             for arch in $ARCHS; do
                 ./docker-build.sh "$distro" "$arch"
@@ -80,16 +88,23 @@ build-docker-images:
 
 test-docker-images:
     stage: test
-    image: docker:latest
+    image: debian:testing
     services:
         - docker:dind
+    variables:
+        DOCKER_HOST: 'tcp://docker:2375'
     dependencies:
         - build-docker-images
     script: |
         set -e
-        apk update
-        apk add bash
-        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+        # Install tools
+        apt-get -y update
+        apt-get -y install --no-install-recommends binfmt-support ca-certificates docker.io qemu-user-static
+        # Enable support for additional executable binary formats
+        update-binfmts --enable
+        echo "Executable binary formats:"
+        update-binfmts --display | grep -v = | sed -e 's/^/  /' -e 's/:$//'
+        # Test the Docker images
         for distro in $BASE_DISTROS $EXTRA_DISTROS; do
             for arch in $ARCHS; do
                 ./docker-test.sh "$distro" "$arch"
@@ -98,19 +113,24 @@ test-docker-images:
 
 push-docker-images:
     stage: push
-    image: docker:latest
+    image: debian:testing
     services:
         - docker:dind
+    variables:
+        DOCKER_HOST: 'tcp://docker:2375'
     dependencies:
         - build-docker-images
     script: |
         set -e
-        apk update
-        apk add bash
+        # Install tools
+        apt-get -y update
+        apt-get -y install --no-install-recommends ca-certificates docker.io
+        # Log in to Docker registries
         echo "$CI_JOB_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
         if [ -n "$DOCKER_HUB_ACCESS_TOKEN" ]; then
             echo "$DOCKER_HUB_ACCESS_TOKEN" | docker login -u "$DOCKER_HUB_USER" --password-stdin "$DOCKER_HUB_REGISTRY"
         fi
+        # Push the Docker images
         for distro in $BASE_DISTROS $EXTRA_DISTROS; do
             for arch in $ARCHS; do
                 ./docker-push.sh "$distro" "$arch"
@@ -120,7 +140,7 @@ push-docker-images:
             ./docker-push-manifest.sh "$distro" "$ARCHS"
         done
         # Clean tags
-        #apk add curl jq gawk
+        #apt-get -y install curl jq
         #for distro in $BASE_DISTROS $EXTRA_DISTROS; do
         #    for arch in $ARCHS; do
         #        ./docker-cleanup.sh "$distro" "$arch"
