@@ -46,6 +46,7 @@ docker build \
     --platform "$platform" \
     --progress plain \
     --pull \
+    --squash \
     --tag "$CI_REGISTRY_IMAGE/$IMAGE:$TAG" \
     .
 

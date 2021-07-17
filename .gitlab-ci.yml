@@ -55,7 +55,8 @@ build-docker-images:
     stage: register
     image: docker:latest
     services:
-        - docker:dind
+        - name: docker:dind
+          command: ["--experimental"]
     dependencies:
         - build-rootfs
     artifacts:
