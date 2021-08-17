@@ -62,9 +62,7 @@ build-rootfs:
 
 build-docker-images:
     stage: register
-    image: docker:latest
-    services:
-        - docker:dind
+    image: debian:testing
     dependencies:
         - build-rootfs
     artifacts:
@@ -72,61 +70,55 @@ build-docker-images:
             - "*.conf"
     script: |
         set -e
-        apk update
-        apk add bash
-        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-        echo "$CI_JOB_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+        apt-get -y update
+        apt-get -y install podman
+        echo "$CI_JOB_TOKEN" | podman login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
         for distro in $BASE_DISTROS; do
             for arch in $ARCHS; do
-                ./docker-build.sh "$distro" "$arch"
+                ./podman-build.sh "$distro" "$arch"
             done
         done
         for distro in $EXTRA_DISTROS; do
             for arch in $ARCHS; do
-                ./docker-build-extra.sh "$distro" "$arch"
+                ./podman-build-extra.sh "$distro" "$arch"
             done
         done
 
 test-docker-images:
     stage: test
-    image: docker:latest
-    services:
-        - docker:dind
+    image: debian:testing
     dependencies:
         - build-docker-images
     script: |
         set -e
-        apk update
-        apk add bash
-        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+        apt-get -y update
+        apt-get -y install podman
         for distro in $BASE_DISTROS $EXTRA_DISTROS; do
             for arch in $ARCHS; do
-                ./docker-test.sh "$distro" "$arch"
+                ./podman-test.sh "$distro" "$arch"
             done
         done
 
 push-docker-images:
     stage: push
-    image: docker:latest
-    services:
-        - docker:dind
+    image: debian:testing
     dependencies:
         - build-docker-images
     script: |
         set -e
-        apk update
-        apk add bash
-        echo "$CI_JOB_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+        apt-get -y update
+        apt-get -y install podman
+        echo "$CI_JOB_TOKEN" | podman login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
         if [ -n "$DOCKER_HUB_ACCESS_TOKEN" ]; then
-            echo "$DOCKER_HUB_ACCESS_TOKEN" | docker login -u "$DOCKER_HUB_USER" --password-stdin "$DOCKER_HUB_REGISTRY"
+            echo "$DOCKER_HUB_ACCESS_TOKEN" | podman login -u "$DOCKER_HUB_USER" --password-stdin "$DOCKER_HUB_REGISTRY"
         fi
         for distro in $BASE_DISTROS $EXTRA_DISTROS; do
             for arch in $ARCHS; do
-                ./docker-push.sh "$distro" "$arch"
+                ./podman-push.sh "$distro" "$arch"
             done
         done
         for distro in $BASE_DISTROS $EXTRA_DISTROS; do
-            ./docker-push-manifest.sh "$distro" "$ARCHS"
+            ./podman-push-manifest.sh "$distro" "$ARCHS"
         done
         # Clean tags
         #apk add curl jq gawk
