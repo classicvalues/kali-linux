@@ -15,7 +15,10 @@ IMAGE=$DISTRO
 
 TAG=$VERSION-$ARCHITECTURE
 
-podman build \
+PODMAN_ARGS=
+[ -d /run/systemd ] || PODMAN_ARGS="--cgroup-manager=cgroupfs"
+
+podman build $PODMAN_ARGS \
     --build-arg CI_REGISTRY_IMAGE="$CI_REGISTRY_IMAGE"\
     --build-arg TAG="$TAG" \
     --file extra/"$IMAGE" \
