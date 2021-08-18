@@ -71,7 +71,7 @@ build-docker-images:
     script: |
         set -e
         apt-get -y update
-        apt-get -y install podman
+        apt-get -y install ca-certificates podman
         echo "$CI_JOB_TOKEN" | podman login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
         for distro in $BASE_DISTROS; do
             for arch in $ARCHS; do
@@ -107,7 +107,7 @@ push-docker-images:
     script: |
         set -e
         apt-get -y update
-        apt-get -y install podman
+        apt-get -y install ca-certificates podman
         echo "$CI_JOB_TOKEN" | podman login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
         if [ -n "$DOCKER_HUB_ACCESS_TOKEN" ]; then
             echo "$DOCKER_HUB_ACCESS_TOKEN" | podman login -u "$DOCKER_HUB_USER" --password-stdin "$DOCKER_HUB_REGISTRY"
