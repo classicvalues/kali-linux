@@ -21,7 +21,7 @@ build-rootfs:
         set -e
         # Install tools
         apt-get -y update
-        apt-get -y install debootstrap pixz qemu-user-static wget
+        apt-get -y install debootstrap pixz qemu-user-static wget   kmod
         # Install Kali archive keyring
         KEYRING_PKG_URL=$(wget -nv -O - \
             https://http.kali.org/kali/dists/kali-rolling/main/binary-amd64/Packages.gz \
@@ -32,10 +32,20 @@ build-rootfs:
         rm kali-archive-keyring_*_all.deb
         # Enable support for additional executable binary formats
         update-binfmts --enable
-        echo "Kernel details: $(uname -a)"
         echo "Executable binary formats:"
         #update-binfmts --display | grep -v = | sed -e 's/^/  /' -e 's/:$//'
         update-binfmts --display
+        # Debug
+        echo "== ls -l /dev"
+        ls -l /dev
+        echo "== lsmod"
+        lsmod
+        echo "== cat /proc/mounts"
+        cat /proc/mounts
+        echo "== uname -a"
+        uname -a
+        echo "== cat /proc/cmdline"
+        cat /proc/cmdline 
         # Test architectures right away
         echo "Arch test:"
         for arch in $ARCHS; do
