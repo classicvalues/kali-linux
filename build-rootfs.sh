@@ -17,11 +17,11 @@ rootfs_chroot() {
 }
 
 
-#if [ ! -e /usr/share/debootstrap/scripts/"$distro" ]; then
-#    echo >&2 "ERROR: debootstrap has no script for $distro"
-#    echo >&2 "ERROR: use a newer debootstrap"
-#    exit 1
-#fi
+if [ ! -e /usr/share/debootstrap/scripts/"$distro" ]; then
+    echo >&2 "ERROR: debootstrap has no script for $distro"
+    echo >&2 "ERROR: use a newer debootstrap"
+    exit 1
+fi
 
 if [ ! -e /usr/share/keyrings/kali-archive-keyring.gpg ]; then
     echo >&2 "ERROR: you need /usr/share/keyrings/kali-archive-keyring.gpg"
@@ -34,9 +34,8 @@ rm -rf "$rootfsDir" "$tarball"
 retry=1
 while [ $retry -ge 0 ]; do
     ret=0
-    mmdebstrap --variant=minbase --components=main,contrib,non-free \
+    debootstrap --variant=minbase --components=main,contrib,non-free \
         --arch="$architecture" --include=kali-archive-keyring \
-        --skip=cleanup/apt \
         "$distro" "$rootfsDir" "$mirror" || ret=$?
     if [ $ret -eq 0   ]; then break; fi
     if [ $retry -eq 0 ]; then exit $ret; fi
