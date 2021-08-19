@@ -1,6 +1,6 @@
 
 variables:
-    BASE_DISTROS: 'kali-rolling'  # 'kali-rolling kali-dev kali-last-snapshot'
+    BASE_DISTROS: 'kali-last-snapshot'  # 'kali-rolling kali-dev kali-last-snapshot'
     EXTRA_DISTROS: 'kali-experimental'  # 'kali-experimental kali-bleeding-edge'
     ARCHS: 'arm64'  # 'amd64 arm64 armhf'
 
