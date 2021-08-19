@@ -34,9 +34,12 @@ rm -rf "$rootfsDir" "$tarball"
 retry=1
 while [ $retry -ge 0 ]; do
     ret=0
+    #debootstrap --variant=minbase --components=main,contrib,non-free \
+    #    --arch="$architecture" --include=kali-archive-keyring \
+    #    "$distro" "$rootfsDir" "$mirror" || ret=$?
     debootstrap --variant=minbase --components=main,contrib,non-free \
-        --arch="$architecture" --include=kali-archive-keyring \
-        "$distro" "$rootfsDir" "$mirror" || ret=$?
+        --arch="$architecture" \
+        "buster" "$rootfsDir" "http://deb.debian.org/debian" || ret=$?
     if [ $ret -eq 0   ]; then break; fi
     if [ $retry -eq 0 ]; then exit $ret; fi
     retry=$((retry - 1))
