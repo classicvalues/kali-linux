@@ -2,7 +2,7 @@
 variables:
     BASE_DISTROS: 'kali-rolling kali-dev kali-last-snapshot'
     EXTRA_DISTROS: 'kali-experimental kali-bleeding-edge'
-    ARCHS: 'amd64 arm64 armhf'
+    ARCHS: 'amd64'  # 'amd64 arm64 armhf'
 
 stages:
     - build
