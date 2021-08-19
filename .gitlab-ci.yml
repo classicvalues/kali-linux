@@ -31,7 +31,7 @@ build-rootfs:
         dpkg -i kali-archive-keyring_*_all.deb
         rm kali-archive-keyring_*_all.deb
         # Enable support for additional executable binary formats
-        #update-binfmts --enable
+        update-binfmts --enable
         echo "Executable binary formats:"
         #update-binfmts --display | grep -v = | sed -e 's/^/  /' -e 's/:$//'
         update-binfmts --display
