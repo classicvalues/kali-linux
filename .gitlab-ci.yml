@@ -45,7 +45,9 @@ build-rootfs:
         echo "== uname -a"
         uname -a
         echo "== cat /proc/cmdline"
-        cat /proc/cmdline 
+        cat /proc/cmdline
+        echo "== zgrep BINFMT_MISC /proc/config.gz"
+        zgrep BINFMT_MISC /proc/config.gz
         # Test architectures right away
         echo "Arch test:"
         for arch in $ARCHS; do
