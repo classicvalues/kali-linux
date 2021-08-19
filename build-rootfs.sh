@@ -39,7 +39,7 @@ while [ $retry -ge 0 ]; do
     #    "$distro" "$rootfsDir" "$mirror" || ret=$?
     debootstrap --variant=minbase --components=main,contrib,non-free \
         --arch="$architecture" \
-        "buster" "$rootfsDir" "http://deb.debian.org/debian" || ret=$?
+        "unstable" "$rootfsDir" "http://deb.debian.org/debian" || ret=$?
     if [ $ret -eq 0   ]; then break; fi
     if [ $retry -eq 0 ]; then exit $ret; fi
     retry=$((retry - 1))
