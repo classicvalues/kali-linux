@@ -19,6 +19,8 @@ build-rootfs:
             - "*.release.version"
     script: |
         set -e
+        printenv
+        exit 1
         # Install tools
         apt-get -y update
         apt-get -y install debootstrap pixz qemu-user-static wget
