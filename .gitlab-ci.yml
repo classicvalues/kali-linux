@@ -32,6 +32,10 @@ build-rootfs:
         rm kali-archive-keyring_*_all.deb
         # Enable support for additional executable binary formats
         update-binfmts --enable
+        echo "Kernel details: $(uname -a)"
+        echo "Executable binary formats:"
+        #update-binfmts --display | grep -v = | sed -e 's/^/  /' -e 's/:$//'
+        update-binfmts --display
         # Take a look at the surroundings
         echo "================================"
         PS4=====\ $\ ; set -x
@@ -77,7 +81,8 @@ build-docker-images:
     stage: register
     image: docker:latest
     services:
-        - docker:dind
+        - name: docker:dind
+          command: ["--experimental"]
     dependencies:
         - build-rootfs
     artifacts:
