@@ -49,16 +49,16 @@ docker build \
   --squash \
   --tag "$CI_REGISTRY_IMAGE/$IMAGE:$TAG" \
   .
-    --build-arg TARBALL="$TARBALL" \
-    --build-arg BUILD_DATE="$BUILD_DATE" \
-    --build-arg VERSION="$VERSION" \
-    --build-arg PROJECT_URL="$PROJECT_URL" \
-    --build-arg VCS_REF="$VCS_REF" \
-    --build-arg RELEASE_DESCRIPTION="$RELEASE_DESCRIPTION" \
-    --platform "$platform" \
-    --progress plain \
-    --tag "$CI_REGISTRY_IMAGE/$IMAGE:$TAG" \
-    .
+--build-arg TARBALL="$TARBALL" \
+  --build-arg BUILD_DATE="$BUILD_DATE" \
+  --build-arg VERSION="$VERSION" \
+  --build-arg PROJECT_URL="$PROJECT_URL" \
+  --build-arg VCS_REF="$VCS_REF" \
+  --build-arg RELEASE_DESCRIPTION="$RELEASE_DESCRIPTION" \
+  --platform "$platform" \
+  --progress plain \
+  --tag "$CI_REGISTRY_IMAGE/$IMAGE:$TAG" \
+  .
 
 if [ -n "${CI_JOB_TOKEN:-}" ]; then
   # Push the image so that subsequent jobs can fetch it
