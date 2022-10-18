@@ -19,6 +19,6 @@ LABEL org.opencontainers.image.created="$BUILD_DATE" \
       org.opencontainers.image.url="https://www.kali.org/" \
       org.opencontainers.image.authors="Kali Developers <devel@kali.org>"
 
-ADD $TARBALL /
+COPY $TARBALL /
 
 CMD ["bash"]
